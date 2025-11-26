@@ -1,0 +1,17 @@
+node_modules/
+.env
+.DS_Store
+*.log
+dist/
+build/
+.vscode/
+.idea/
+js/config.js
+
+# Data
+data/archive/
+data/hyg/
+data/**/*.csv
+data/**/*.gz
+data/**/__pycache__/
+**/*.pyc

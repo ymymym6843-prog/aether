@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | Ultimate Weather Experience</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fonts: Inter for UI, Orbitron for Numbers/Tech -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Background Canvas for Weather Effects -->
+    <canvas id="weatherCanvas"></canvas>
+
+    <!-- Main Application Container -->
+    <main class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-symbol">
+                    <!-- Æ Ligature SVG with White to Cyan Gradient -->
+                    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0" y1="0" x2="60" y2="60"
+                                gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#FFFFFF" />
+                                <stop offset="100%" stop-color="#00F2FF" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Æ Symbol: Merged A and E -->
+                        <path
+                            d="M 10 50 L 30 10 L 30 50 M 30 10 L 50 10 M 30 30 L 45 30 M 30 50 L 50 50 M 20 30 L 30 30"
+                            stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="app-subtitle">AETHER</span>
+                    <div class="header-info">
+                        <span id="dataSourceBadge" class="pill pill-mock" aria-live="polite">Mock Data</span>
+                        <span id="locationStatus" class="pill pill-quiet" aria-live="polite">Manual</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="search-box">
+                    <input type="text" id="citySearch" placeholder="Search City...">
+                    <button id="searchBtn" aria-label="Search city">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+                <button id="gpsBtn" class="icon-btn" title="Current Location" aria-label="Use current location">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <line x1="12" y1="2" x2="12" y2="6"></line>
+                        <line x1="12" y1="18" x2="12" y2="22"></line>
+                        <line x1="2" y1="12" x2="6" y2="12"></line>
+                        <line x1="18" y1="12" x2="22" y2="12"></line>
+                    </svg>
+                </button>
+                <button id="favBtn" class="icon-btn" title="Add to Favorites" aria-label="Toggle favorite">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tab Content Area -->
+        <div class="content-area">
+
+            <!-- TAB 1: TODAY -->
+            <section id="tab-today" class="tab-section active">
+                <!-- Current Weather Hero -->
+                <div class="current-weather-card glass-panel">
+                    <!-- Dashboard Info (City & Time) -->
+                    <div class="dashboard-info">
+                        <h2 id="dashboardCity">--</h2>
+                        <p id="dashboardDate">--</p>
+                    </div>
+
+                    <div class="temp-display">
+                        <span id="currentTemp" class="main-temp">--°</span>
+                        <div class="weather-icon-large" id="mainWeatherIcon"></div>
+                    </div>
+                    <div class="temp-range">
+                        <span class="temp-high">H: <span id="maxTemp">--</span>°</span>
+                        <span class="divider">|</span>
+                        <span class="temp-low">L: <span id="minTemp">--</span>°</span>
+                    </div>
+                    <div class="weather-desc" id="weatherDesc">Loading...</div>
+
+                    <!-- Precipitation Alert Badge -->
+                    <div id="precipAlert" class="precip-badge hidden">
+                        <span class="icon">☔</span>
+                        <span class="text">Rain in 15 min</span>
+                    </div>
+                </div>
+
+                <!-- Weather Map (Was Live Atmosphere) -->
+                <div class="live-map-card glass-panel">
+                    <div class="card-header">Weather Map</div>
+                    <div class="map-visual" id="miniMap">
+                        <div class="radar-scan"></div>
+                        <!-- CSS/SVG Blobs will be injected here -->
+                        <div class="wind-lines"></div>
+                        <div class="cloud-blobs"></div>
+                        <div class="precip-particles"></div>
+                    </div>
+                </div>
+
+                <!-- Hourly Forecast -->
+                <div class="forecast-hourly glass-panel">
+                    <div class="section-title">Hourly</div>
+                    <div class="hourly-grid" id="hourlyGrid">
+                        <!-- JS Generated -->
+                    </div>
+                </div>
+
+                <!-- 5-Day Trend Graph -->
+                <div class="forecast-daily glass-panel">
+                    <div class="section-title">5-Day Trend</div>
+                    <canvas id="trendChart" height="100"></canvas>
+                    <div class="daily-list" id="dailyList">
+                        <!-- JS Generated -->
+                    </div>
+                </div>
+
+                <!-- AQI & Details -->
+                <div class="aqi-section glass-panel">
+                    <div class="section-title">Air Quality</div>
+                    <div class="aqi-container">
+                        <div class="aqi-chart">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" id="aqiRing" stroke-dasharray="0, 100"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage" id="aqiScore">--</text>
+                            </svg>
+                            <span class="aqi-label" id="aqiStatus">--</span>
+                        </div>
+                        <div class="aqi-grid" id="aqiDetails">
+                            <!-- PM2.5, PM10 etc -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio/Lifestyle -->
+                <div class="lifestyle-section glass-panel">
+                    <div class="section-title">Bio-Atmosphere</div>
+                    <div class="lifestyle-grid" id="lifestyleGrid">
+                        <!-- Running, UV, etc -->
+                    </div>
+                    <div class="outfit-guide glass-inner" id="outfitGuide">
+                        <!-- Outfit recommendation -->
+                    </div>
+                </div>
+
+                <!-- City Highlights -->
+                <div class="highlights-section glass-panel">
+                    <div class="section-title">City Highlights</div>
+                    <div class="city-grid" id="cityHighlights">
+                        <!-- Domestic & Global -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: FAVORITES -->
+            <section id="tab-favorites" class="tab-section">
+                <div class="glass-header">
+                    <h2>Favorites</h2>
+                </div>
+                <div class="favorites-list" id="favoritesList">
+                    <!-- JS Generated Cards -->
+                </div>
+            </section>
+
+            <!-- TAB 3: SKY VIEW -->
+            <section id="tab-skyview" class="tab-section">
+                <div class="glass-header">
+                    <h2>Sky View</h2>
+                    <span class="sub-text">Living Data</span>
+                </div>
+
+                <!-- Solar Arc -->
+                <div class="sky-card glass-panel">
+                    <div class="card-title">Solar Arc</div>
+                    <div class="solar-container">
+                        <svg id="solarArcSvg" viewBox="0 0 200 100">
+                            <defs>
+                                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <path class="arc-bg" d="M 20 100 A 80 80 0 0 1 180 100" fill="none"
+                                stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                            <circle id="sunIcon" cx="20" cy="100" r="12" fill="#FFD700" filter="url(#glow)" />
+                        </svg>
+                        <div class="solar-times">
+                            <span id="sunriseTime">06:00</span>
+                            <span id="sunsetTime">18:00</span>
+                        </div>
+                        <div class="sky-info-text">Current sun position</div>
+                    </div>
+                </div>
+
+                <!-- Breathing Moon -->
+                <div class="sky-card glass-panel">
+                    <div class="card-title">Breathing Moon</div>
+                    <div class="moon-container">
+                        <div class="moon-visual" id="moonVisual">
+                            <div class="moon-glow"></div>
+                        </div>
+                        <div class="moon-details">
+                            <h3 id="moonPhaseName">Waxing Gibbous</h3>
+                            <p id="moonNextEvent">Full Moon in 3 days</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Constellations -->
+                <div class="sky-card glass-panel">
+                    <div class="card-title">Constellations</div>
+                    <canvas id="zodiacCanvas" height="200"></canvas>
+                    <div class="zodiac-info">
+                        <h3 id="zodiacName">Leo</h3>
+                        <p id="zodiacDesc">The Lion</p>
+                    </div>
+                </div>
+
+                <!-- Meteor Shower -->
+                <div class="sky-card glass-panel meteor-card">
+                    <div class="card-title">Meteor Shower</div>
+                    <div class="meteor-content">
+                        <h3 id="meteorName">Perseids</h3>
+                        <p id="meteorTime">Aug 12 Night, 100/hr</p>
+                    </div>
+                    <canvas id="meteorCanvas"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Floating Navigation Bar -->
+        <nav class="floating-nav">
+            <button class="nav-btn active" data-tab="today">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Today</span>
+            </button>
+            <button class="nav-btn" data-tab="favorites">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                    <path
+                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                    </path>
+                </svg>
+                <span>Favorites</span>
+            </button>
+            <button class="nav-btn" data-tab="skyview">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                    </path>
+                    <path d="M2 12h20"></path>
+                </svg>
+                <span>Sky View</span>
+            </button>
+        </nav>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

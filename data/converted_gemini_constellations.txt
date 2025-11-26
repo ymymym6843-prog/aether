@@ -1,0 +1,203 @@
+    constellations: [
+        // 1. Aries - Converted from Gemini Data
+        {
+            name: 'Aries',
+            start: '03-21',
+            end: '04-19',
+            points: [
+                { x: -125.0, y: -50.0, brightness: 1.37 },
+                { x: -25.0, y: 25.0, brightness: 1.72 },
+                { x: 100.0, y: -37.5, brightness: 1.38 },
+                { x: 0.0, y: -25.0, brightness: 1.36 }
+            ],
+            connections: [[0, 1], [1, 2], [1, 3]]
+        },
+        // 2. Taurus - Converted from Gemini Data
+        {
+            name: 'Taurus',
+            start: '04-20',
+            end: '05-20',
+            points: [
+                { x: -50.0, y: -75.0, brightness: 1.57 },
+                { x: 50.0, y: -75.0, brightness: 1.51 },
+                { x: 0.0, y: -0.0, brightness: 1.87 },
+                { x: -25.0, y: 50.0, brightness: 1.52 },
+                { x: 25.0, y: 50.0, brightness: 1.58 },
+                { x: 100.0, y: 25.0, brightness: 1.39 },
+                { x: 125.0, y: 37.5, brightness: 1.38 }
+            ],
+            connections: [[0, 1], [2, 0], [2, 1], [2, 3], [3, 4], [4, 2], [5, 6]]
+        },
+        // 3. Gemini - Converted from Gemini Data
+        {
+            name: 'Gemini',
+            start: '05-21',
+            end: '06-21',
+            points: [
+                { x: -50.0, y: 100.0, brightness: 1.51 },
+                { x: -50.0, y: -100.0, brightness: 1.35 },
+                { x: 50.0, y: 100.0, brightness: 1.51 },
+                { x: 50.0, y: -100.0, brightness: 1.36 },
+                { x: -50.0, y: 50.0, brightness: 1.42 },
+                { x: 50.0, y: 50.0, brightness: 1.42 },
+                { x: -50.0, y: -50.0, brightness: 1.41 },
+                { x: 50.0, y: -50.0, brightness: 1.36 },
+                { x: -75.0, y: 75.0, brightness: 1.4 },
+                { x: 75.0, y: 75.0, brightness: 1.44 }
+            ],
+            connections: [[0, 1], [2, 3], [4, 5], [6, 7], [0, 8], [2, 9]]
+        },
+        // 4. Cancer - Converted from Gemini Data
+        {
+            name: 'Cancer',
+            start: '06-22',
+            end: '07-22',
+            points: [
+                { x: 0.0, y: -0.0, brightness: 1.72 },
+                { x: -50.0, y: 50.0, brightness: 1.57 },
+                { x: -75.0, y: 25.0, brightness: 1.41 },
+                { x: 50.0, y: 50.0, brightness: 1.57 },
+                { x: 75.0, y: 25.0, brightness: 1.35 },
+                { x: 0.0, y: -75.0, brightness: 1.43 }
+            ],
+            connections: [[0, 1], [1, 2], [0, 3], [3, 4], [0, 5]]
+        },
+        // 5. Leo - Converted from Gemini Data
+        {
+            name: 'Leo',
+            start: '07-23',
+            end: '08-22',
+            points: [
+                { x: 100.0, y: 25.0, brightness: 1.54 },
+                { x: 25.0, y: -25.0, brightness: 1.84 },
+                { x: -50.0, y: -0.0, brightness: 1.53 },
+                { x: -75.0, y: -75.0, brightness: 1.54 },
+                { x: 0.0, y: -100.0, brightness: 1.54 },
+                { x: 100.0, y: 75.0, brightness: 1.58 },
+                { x: 50.0, y: 100.0, brightness: 1.51 },
+                { x: 0.0, y: 75.0, brightness: 1.57 }
+            ],
+            connections: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1], [0, 5], [5, 6], [6, 7], [7, 1]]
+        },
+        // 6. Virgo - Converted from Gemini Data
+        {
+            name: 'Virgo',
+            start: '08-23',
+            end: '09-22',
+            points: [
+                { x: -25.0, y: -100.0, brightness: 1.44 },
+                { x: 0.0, y: -25.0, brightness: 1.81 },
+                { x: 75.0, y: -0.0, brightness: 1.68 },
+                { x: 25.0, y: 75.0, brightness: 1.7 },
+                { x: -50.0, y: 50.0, brightness: 1.57 },
+                { x: -75.0, y: -0.0, brightness: 1.35 },
+                { x: 125.0, y: -25.0, brightness: 1.39 },
+                { x: 0.0, y: 150.0, brightness: 1.4 }
+            ],
+            connections: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1], [1, 5], [2, 6], [3, 7]]
+        },
+        // 7. Libra - Converted from Gemini Data
+        {
+            name: 'Libra',
+            start: '09-23',
+            end: '10-23',
+            points: [
+                { x: 0.0, y: 75.0, brightness: 1.57 },
+                { x: -75.0, y: -0.0, brightness: 1.65 },
+                { x: 75.0, y: -0.0, brightness: 1.68 },
+                { x: -50.0, y: -75.0, brightness: 1.42 },
+                { x: 50.0, y: -75.0, brightness: 1.36 }
+            ],
+            connections: [[0, 1], [1, 2], [2, 0], [1, 3], [2, 4]]
+        },
+        // 8. Scorpio - Converted from Gemini Data
+        {
+            name: 'Scorpio',
+            start: '10-24',
+            end: '11-21',
+            points: [
+                { x: -100.0, y: 25.0, brightness: 1.41 },
+                { x: -25.0, y: -0.0, brightness: 1.7 },
+                { x: -100.0, y: -25.0, brightness: 1.38 },
+                { x: 25.0, y: -0.0, brightness: 1.51 },
+                { x: 75.0, y: -25.0, brightness: 1.59 },
+                { x: 100.0, y: -75.0, brightness: 1.54 },
+                { x: 75.0, y: -125.0, brightness: 1.52 },
+                { x: 25.0, y: -100.0, brightness: 1.55 },
+                { x: 50.0, y: -75.0, brightness: 1.36 }
+            ],
+            connections: [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8]]
+        },
+        // 9. Sagittarius - Converted from Gemini Data
+        {
+            name: 'Sagittarius',
+            start: '11-22',
+            end: '12-21',
+            points: [
+                { x: -50.0, y: -0.0, brightness: 1.53 },
+                { x: 25.0, y: -0.0, brightness: 1.66 },
+                { x: 50.0, y: -50.0, brightness: 1.51 },
+                { x: -25.0, y: -50.0, brightness: 1.73 },
+                { x: 100.0, y: 50.0, brightness: 1.36 },
+                { x: -75.0, y: -100.0, brightness: 1.44 },
+                { x: 0.0, y: -0.0, brightness: 1.42 },
+                { x: 0.0, y: 75.0, brightness: 1.42 }
+            ],
+            connections: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 4], [3, 5], [6, 7]]
+        },
+        // 10. Capricorn - Converted from Gemini Data
+        {
+            name: 'Capricorn',
+            start: '12-22',
+            end: '01-19',
+            points: [
+                { x: -100.0, y: 50.0, brightness: 1.52 },
+                { x: 0.0, y: -50.0, brightness: 1.59 },
+                { x: 100.0, y: 50.0, brightness: 1.51 },
+                { x: -50.0, y: 75.0, brightness: 1.51 },
+                { x: 0.0, y: 50.0, brightness: 1.51 },
+                { x: 50.0, y: 75.0, brightness: 1.58 }
+            ],
+            connections: [[0, 1], [1, 2], [0, 3], [3, 4], [2, 5], [5, 4]]
+        },
+        // 11. Aquarius - Converted from Gemini Data
+        {
+            name: 'Aquarius',
+            start: '01-20',
+            end: '02-18',
+            points: [
+                { x: 0.0, y: 100.0, brightness: 1.58 },
+                { x: -50.0, y: 50.0, brightness: 1.57 },
+                { x: 0.0, y: -0.0, brightness: 1.72 },
+                { x: 50.0, y: 50.0, brightness: 1.57 },
+                { x: 0.0, y: -75.0, brightness: 1.43 },
+                { x: -75.0, y: 25.0, brightness: 1.41 },
+                { x: -100.0, y: -0.0, brightness: 1.54 },
+                { x: -75.0, y: -25.0, brightness: 1.52 },
+                { x: -100.0, y: -50.0, brightness: 1.44 },
+                { x: 75.0, y: 25.0, brightness: 1.35 },
+                { x: 100.0, y: -0.0, brightness: 1.58 },
+                { x: 75.0, y: -25.0, brightness: 1.59 },
+                { x: 100.0, y: -50.0, brightness: 1.4 }
+            ],
+            connections: [[0, 1], [1, 2], [0, 3], [3, 2], [2, 4], [5, 6], [6, 7], [7, 8], [9, 10], [10, 11], [11, 12]]
+        },
+        // 12. Pisces - Converted from Gemini Data
+        {
+            name: 'Pisces',
+            start: '02-19',
+            end: '03-20',
+            points: [
+                { x: 0.0, y: -100.0, brightness: 1.54 },
+                { x: -100.0, y: -0.0, brightness: 1.69 },
+                { x: -125.0, y: 25.0, brightness: 1.54 },
+                { x: -100.0, y: 50.0, brightness: 1.52 },
+                { x: -75.0, y: 25.0, brightness: 1.56 },
+                { x: 75.0, y: -25.0, brightness: 1.74 },
+                { x: 100.0, y: 50.0, brightness: 1.51 },
+                { x: 125.0, y: 25.0, brightness: 1.59 },
+                { x: 100.0, y: -0.0, brightness: 1.58 }
+            ],
+            connections: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1], [0, 5], [5, 6], [6, 7], [7, 8], [8, 5]]
+        }
+    ],
