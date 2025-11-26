@@ -38,7 +38,7 @@ export class WeatherEngine {
         const rect = this.canvas.getBoundingClientRect();
         this.canvas.width = rect.width * dpr;
         this.canvas.height = rect.height * dpr;
-        this.ctx.scale(dpr, dpr);
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         this.w = rect.width;
         this.h = rect.height;
     }

@@ -114,7 +114,8 @@ export const apiService = {
         const sunset = this.formatTime(current.sys?.sunset, timezone);
         const moonPhase = this.calculateMoonPhase(new Date());
 
-        const firstPeriod = forecast.list?.[0];
+        const forecastList = forecast?.list ?? [];
+        const firstPeriod = forecastList[0];
         const precipChance = firstPeriod?.pop != null ? Math.round(firstPeriod.pop * 100) : null;
         const precipVolume = (current.rain?.['1h'] ?? current.snow?.['1h']) || null;
         const precipType = this.resolvePrecipType(current.weather?.[0]?.main, precipVolume);
