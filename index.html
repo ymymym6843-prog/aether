@@ -42,12 +42,16 @@
                 </div>
                 <div class="brand-text">
                     <span class="app-subtitle">AETHER</span>
+                    <div class="header-info">
+                        <span id="dataSourceBadge" class="pill pill-mock" aria-live="polite">Mock Data</span>
+                        <span id="locationStatus" class="pill pill-quiet" aria-live="polite">Manual</span>
+                    </div>
                 </div>
             </div>
             <div class="header-controls">
                 <div class="search-box">
                     <input type="text" id="citySearch" placeholder="Search City...">
-                    <button id="searchBtn">
+                    <button id="searchBtn" aria-label="Search city">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -55,7 +59,7 @@
                         </svg>
                     </button>
                 </div>
-                <button id="gpsBtn" class="icon-btn" title="Current Location">
+                <button id="gpsBtn" class="icon-btn" title="Current Location" aria-label="Use current location">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <circle cx="12" cy="12" r="3"></circle>
@@ -65,7 +69,7 @@
                         <line x1="18" y1="12" x2="22" y2="12"></line>
                     </svg>
                 </button>
-                <button id="favBtn" class="icon-btn" title="Add to Favorites">
+                <button id="favBtn" class="icon-btn" title="Add to Favorites" aria-label="Toggle favorite">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path
                             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
@@ -114,6 +118,7 @@
                         <!-- CSS/SVG Blobs will be injected here -->
                         <div class="wind-lines"></div>
                         <div class="cloud-blobs"></div>
+                        <div class="precip-particles"></div>
                     </div>
                 </div>
 

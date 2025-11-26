@@ -177,12 +177,52 @@ body {
     color: var(--neon-cyan);
     margin-top: 4px;
     display: flex;
-    gap: 5px;
+    gap: 6px;
     opacity: 0.9;
+    flex-wrap: wrap;
 }
 
 .header-info .divider {
     color: var(--text-muted);
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    letter-spacing: 0.3px;
+}
+
+.pill::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+    background: currentColor;
+}
+
+.pill-mock {
+    color: #ffc857;
+    border-color: rgba(255, 200, 87, 0.4);
+    background: rgba(255, 200, 87, 0.08);
+}
+
+.pill-live {
+    color: var(--neon-cyan);
+    border-color: rgba(0, 242, 255, 0.5);
+    background: rgba(0, 242, 255, 0.08);
+}
+
+.pill-quiet {
+    color: var(--text-muted);
+    border-color: var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .header-controls {
@@ -378,6 +418,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background: radial-gradient(circle at 50% 40%, rgba(0, 242, 255, 0.08), rgba(0, 0, 0, 0.2));
 }
 
 .radar-scan {
@@ -390,6 +431,96 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.wind-lines,
+.cloud-blobs,
+.precip-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.wind-line {
+    position: absolute;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0, 242, 255, 0), rgba(0, 242, 255, 0.7));
+    opacity: 0.6;
+    border-radius: 999px;
+    animation: windMove 7s linear infinite;
+}
+
+@keyframes windMove {
+    from {
+        transform: translateX(-150px);
+    }
+
+    to {
+        transform: translateX(150px);
+    }
+}
+
+.cloud-blobs .cloud {
+    position: absolute;
+    width: 180px;
+    height: 90px;
+    background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0));
+    filter: blur(6px);
+    opacity: 0.35;
+    animation: cloudDrift 18s linear infinite;
+}
+
+@keyframes cloudDrift {
+    from {
+        transform: translateX(-40px);
+    }
+
+    to {
+        transform: translateX(60px);
+    }
+}
+
+.precip-particles .drop {
+    position: absolute;
+    width: 2px;
+    height: 8px;
+    background: linear-gradient(180deg, rgba(0, 242, 255, 0.2), rgba(0, 242, 255, 0.9));
+    border-radius: 50px;
+    animation: rainFall 1.8s linear infinite;
+}
+
+.precip-particles .drop.snow {
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+    animation: snowDrift 3.5s linear infinite;
+}
+
+@keyframes rainFall {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(160px);
+        opacity: 1;
+    }
+}
+
+@keyframes snowDrift {
+    from {
+        transform: translateY(-20px) translateX(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(160px) translateX(15px);
+        opacity: 1;
+    }
 }
 
 @keyframes radarSpin {

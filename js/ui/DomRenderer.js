@@ -31,16 +31,92 @@ export const DomRenderer = {
 
         // Icon Logic
         const iconMap = {
-            'Clear': '☀️', 'Rain': '🌧️', 'Clouds': '☁️', 'Snow': '❄️', 'Thunderstorm': '⛈️', 'Mist': '🌫️'
+            'Clear': '☀️',
+            'Rain': '🌧️',
+            'Drizzle': '🌧️',
+            'Clouds': '☁️',
+            'Snow': '❄️',
+            'Thunderstorm': '⛈️',
+            'Mist': '🌫️',
+            'Fog': '🌫️',
+            'Haze': '🌫️'
         };
-        document.getElementById('mainWeatherIcon').textContent = iconMap[data.current.condition] || '☀️';
+        document.getElementById('mainWeatherIcon').textContent = iconMap[data.current.condition] || '🌤️';
 
         // Precip Alert
         const precip = document.getElementById('precipAlert');
-        if (data.current.condition === 'Rain' || data.current.condition === 'Thunderstorm') {
+        const chance = data.current.precipChance;
+        const precipType = data.current.precipType || (data.current.condition === 'Snow' ? 'snow' : null);
+        const shouldShow = (chance != null && chance >= 30) || ['Rain', 'Thunderstorm', 'Drizzle', 'Snow'].includes(data.current.condition);
+
+        if (shouldShow) {
+            const iconEl = precip.querySelector('.icon');
+            const textEl = precip.querySelector('.text');
+            const isSnow = precipType === 'snow';
+            const label = isSnow ? 'Snow' : 'Rain';
+            iconEl.textContent = isSnow ? '❄️' : '☔';
+            textEl.textContent = chance != null ? `${label} chance ${chance}%` : `${label} expected`;
             precip.classList.remove('hidden');
         } else {
             precip.classList.add('hidden');
+        }
+    },
+
+    renderWeatherMap(current) {
+        const map = document.getElementById('miniMap');
+        if (!map) return;
+
+        const cloudLayer = map.querySelector('.cloud-blobs');
+        const windLayer = map.querySelector('.wind-lines');
+        const precipLayer = map.querySelector('.precip-particles');
+
+        const cloudiness = current.clouds ?? 0;
+        const windSpeed = current.wind?.speed ?? 0;
+        const windDir = current.wind?.deg ?? 0;
+        const precipChance = current.precipChance ?? 0;
+        const precipType = current.precipType;
+
+        if (cloudLayer) {
+            cloudLayer.innerHTML = '';
+            const cloudCount = Math.min(6, Math.max(0, Math.round(cloudiness / 20)));
+            for (let i = 0; i < cloudCount; i++) {
+                const blob = document.createElement('span');
+                blob.className = 'cloud';
+                blob.style.left = `${Math.random() * 80}%`;
+                blob.style.top = `${Math.random() * 60}%`;
+                blob.style.animationDelay = `${Math.random() * 5}s`;
+                blob.style.opacity = 0.2 + Math.random() * 0.3;
+                cloudLayer.appendChild(blob);
+            }
+        }
+
+        if (windLayer) {
+            windLayer.innerHTML = '';
+            const lineCount = windSpeed > 0 ? Math.min(12, Math.max(4, Math.round(windSpeed * 1.5))) : 3;
+            for (let i = 0; i < lineCount; i++) {
+                const line = document.createElement('span');
+                line.className = 'wind-line';
+                line.style.top = `${Math.random() * 90}%`;
+                line.style.animationDelay = `${Math.random() * 3}s`;
+                line.style.transform = `rotate(${windDir}deg)`;
+                windLayer.appendChild(line);
+            }
+        }
+
+        if (precipLayer) {
+            precipLayer.innerHTML = '';
+            const showPrecip = precipChance >= 20 || ['rain', 'snow'].includes(precipType);
+            if (showPrecip) {
+                const dropCount = Math.min(60, Math.max(10, Math.round((precipChance || 30) / 2)));
+                for (let i = 0; i < dropCount; i++) {
+                    const drop = document.createElement('span');
+                    drop.className = `drop ${precipType === 'snow' ? 'snow' : ''}`;
+                    drop.style.left = `${Math.random() * 100}%`;
+                    drop.style.animationDelay = `${Math.random() * 1.5}s`;
+                    drop.style.animationDuration = `${1.4 + Math.random() * 1}s`;
+                    precipLayer.appendChild(drop);
+                }
+            }
         }
     },
 
