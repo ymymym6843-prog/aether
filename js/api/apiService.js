@@ -37,7 +37,7 @@ export const apiService = {
     },
 
     async getWeatherByCoords(lat, lon) {
-        if (hasApiKey) {
+        if (API_KEY && API_KEY.length > 10) {
             try {
                 return await this.fetchRealWeatherByCoords(lat, lon);
             } catch (error) {
@@ -77,7 +77,7 @@ export const apiService = {
 
         const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
         const forecastRes = await fetch(forecastUrl);
-        const forecastData = forecastRes.ok ? await forecastRes.json() : { list: [] };
+        const forecastData = await forecastRes.json();
 
         const cityName = current.name || 'Current Location';
         return this.mapData(current, forecastData, cityName, current.timezone, { lat, lon });
@@ -114,8 +114,7 @@ export const apiService = {
         const sunset = this.formatTime(current.sys?.sunset, timezone);
         const moonPhase = this.calculateMoonPhase(new Date());
 
-        const forecastList = Array.isArray(forecast?.list) ? forecast.list : [];
-        const firstPeriod = forecastList[0];
+        const firstPeriod = forecast.list?.[0];
         const precipChance = firstPeriod?.pop != null ? Math.round(firstPeriod.pop * 100) : null;
         const precipVolume = (current.rain?.['1h'] ?? current.snow?.['1h']) || null;
         const precipType = this.resolvePrecipType(current.weather?.[0]?.main, precipVolume);
