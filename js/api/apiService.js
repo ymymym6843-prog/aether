@@ -1,3 +1,5 @@
+import { mockData } from '../data/mockData.js';
+
 // City timezone offsets (in seconds from UTC)
 const cityTimezones = {
     'Seoul': 32400,      // UTC+9
@@ -12,8 +14,6 @@ const cityTimezones = {
     'Paris': 3600,       // UTC+1
     'Sydney': 39600      // UTC+11
 };
-
-import { mockData } from '../data/mockData.js';
 
 // 🔴 CONFIGURATION: Provide your OpenWeatherMap API key at runtime to avoid committing secrets.
 // 1) Set window.AETHER_API_KEY in a separate config script injected before this bundle, or
