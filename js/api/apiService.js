@@ -27,19 +27,24 @@ export const apiService = {
                 return await this.fetchRealWeather(city);
             } catch (error) {
                 console.warn("Real API failed/invalid, falling back to mock data.", error);
+                return this.getMockWeather(city, { fallbackReason: 'Live API unavailable' });
             }
         }
 
-        // 2. Fallback to Mock Data (Simulation)
-        await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network
+        return this.getMockWeather(city, { fallbackReason: 'No API key configured' });
+    },
 
-        // Case insensitive search
-        const cityKey = Object.keys(mockData.cities).find(
-            k => k.toLowerCase() === city.toLowerCase()
-        );
+    async getWeatherByCoords(lat, lon) {
+        if (API_KEY && API_KEY.length > 10) {
+            try {
+                return await this.fetchRealWeatherByCoords(lat, lon);
+            } catch (error) {
+                console.warn("Real API by coords failed/invalid, falling back to mock data.", error);
+                return this.getMockWeather('Seoul', { fallbackReason: 'GPS fallback to mock', coords: { lat, lon } });
+            }
+        }
 
-        // Return found city or default to Seoul
-        return cityKey ? mockData.cities[cityKey] : mockData.cities['Seoul'];
+        return this.getMockWeather('Seoul', { fallbackReason: 'No API key configured', coords: { lat, lon } });
     },
 
     async fetchRealWeather(city) {
@@ -57,11 +62,60 @@ export const apiService = {
         const forecastData = await forecastRes.json();
 
         // Pass city to mapData for timezone handling
-        return this.mapData(current, forecastData, city);
+        return this.mapData(current, forecastData, city, current.timezone, current.coord);
     },
 
-    mapData(current, forecast, city) {
+    async fetchRealWeatherByCoords(lat, lon) {
+        console.log(`Fetching real weather for coords ${lat},${lon}...`);
+
+        const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+        const currentRes = await fetch(currentUrl);
+        if (!currentRes.ok) throw new Error('Coordinates not found');
+        const current = await currentRes.json();
+
+        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+        const forecastRes = await fetch(forecastUrl);
+        const forecastData = await forecastRes.json();
+
+        const cityName = current.name || 'Current Location';
+        return this.mapData(current, forecastData, cityName, current.timezone, { lat, lon });
+    },
+
+    getMockWeather(city, meta = {}) {
+        // Fallback to Mock Data (Simulation)
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const cityKey = Object.keys(mockData.cities).find(
+                    k => k.toLowerCase() === city.toLowerCase()
+                );
+                const resolvedCity = cityKey || 'Seoul';
+                const payload = mockData.cities[resolvedCity];
+                resolve({
+                    ...payload,
+                    name: resolvedCity,
+                    timezone: cityTimezones[resolvedCity] || 32400,
+                    dataSource: 'mock',
+                    meta: {
+                        ...meta,
+                        requested: meta?.requested || city
+                    }
+                });
+            }, 600);
+        });
+    },
+
+    mapData(current, forecast, city, timezoneOverride, coords) {
         // Adapter: Convert OpenWeatherMap response to AETHER App Schema
+
+        const timezone = timezoneOverride ?? current.timezone ?? cityTimezones[city] ?? 32400;
+        const sunrise = this.formatTime(current.sys?.sunrise, timezone);
+        const sunset = this.formatTime(current.sys?.sunset, timezone);
+        const moonPhase = this.calculateMoonPhase(new Date());
+
+        const firstPeriod = forecast.list?.[0];
+        const precipChance = firstPeriod?.pop != null ? Math.round(firstPeriod.pop * 100) : null;
+        const precipVolume = (current.rain?.['1h'] ?? current.snow?.['1h']) || null;
+        const precipType = this.resolvePrecipType(current.weather?.[0]?.main, precipVolume);
 
         // Calculate High/Low for today based on forecast segments
         const todaySegments = forecast.list.slice(0, 8);
@@ -69,13 +123,28 @@ export const apiService = {
         const todayLow = Math.min(...todaySegments.map(i => i.main.temp_min));
 
         return {
-            timezone: cityTimezones[city] || 32400,
+            name: current.name || city,
+            timezone,
+            dataSource: 'live',
+            meta: {
+                requested: city,
+                coords,
+                fallbackReason: null
+            },
             current: {
                 temp: Math.round(current.main.temp),
                 condition: current.weather[0].main, // 'Clear', 'Rain', etc.
                 high: Math.round(todayHigh),
                 low: Math.round(todayLow),
-                desc: current.weather[0].description
+                desc: current.weather[0].description,
+                clouds: current.clouds?.all ?? null,
+                wind: {
+                    speed: Math.round(current.wind?.speed ?? 0),
+                    deg: current.wind?.deg ?? null
+                },
+                precipChance,
+                precipVolume,
+                precipType
             },
             forecast: {
                 hourly: forecast.list.slice(0, 8).map(item => ({
@@ -90,7 +159,13 @@ export const apiService = {
             aqi: mockData.cities['Seoul'].aqi,
             lifestyle: mockData.cities['Seoul'].lifestyle,
             highlights: mockData.cities['Seoul'].highlights,
-            sky: mockData.cities['Seoul'].sky
+            sky: {
+                sunrise,
+                sunset,
+                moon: { phase: moonPhase, next: mockData.cities['Seoul'].sky.moon.next },
+                zodiac: mockData.cities['Seoul'].sky.zodiac,
+                meteor: mockData.cities['Seoul'].sky.meteor
+            }
         };
     },
 
@@ -129,5 +204,30 @@ export const apiService = {
             if (daily.length >= 5) break;
         }
         return daily;
+    },
+
+    formatTime(unixSeconds, offsetSeconds = 0) {
+        if (!unixSeconds) return '--:--';
+        const utcMillis = (unixSeconds + offsetSeconds) * 1000;
+        const date = new Date(utcMillis);
+        return date.toUTCString().split(' ')[4].slice(0, 5);
+    },
+
+    calculateMoonPhase(date) {
+        const synodicMonth = 29.53058867; // days
+        const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+        const diffDays = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
+        const phase = diffDays % synodicMonth;
+        const index = Math.floor((phase / synodicMonth) * 8);
+        const phases = ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'];
+        return phases[index] || 'Moon';
+    },
+
+    resolvePrecipType(main, volume) {
+        const normalized = (main || '').toLowerCase();
+        if (['rain', 'drizzle', 'thunderstorm'].includes(normalized)) return 'rain';
+        if (normalized === 'snow') return 'snow';
+        if (volume && volume > 0 && !normalized) return 'rain';
+        return null;
     }
 };

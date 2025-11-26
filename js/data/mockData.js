@@ -1,7 +1,17 @@
 export const mockData = {
     cities: {
         'Seoul': {
-            current: { temp: 17, condition: 'Clear', high: 22, low: 12, desc: 'Clear Sky' },
+            current: {
+                temp: 17,
+                condition: 'Clear',
+                high: 22,
+                low: 12,
+                desc: 'Clear Sky',
+                clouds: 10,
+                wind: { speed: 3, deg: 320 },
+                precipChance: 5,
+                precipType: null
+            },
             forecast: {
                 hourly: [
                     { time: '12PM', temp: 18, icon: '☀️' },
@@ -55,7 +65,17 @@ export const mockData = {
             }
         },
         'Jeju': {
-            current: { temp: 21, condition: 'Rain', high: 24, low: 18, desc: 'Light Rain' },
+            current: {
+                temp: 21,
+                condition: 'Rain',
+                high: 24,
+                low: 18,
+                desc: 'Light Rain',
+                clouds: 70,
+                wind: { speed: 6, deg: 210 },
+                precipChance: 65,
+                precipType: 'rain'
+            },
             forecast: {
                 hourly: [
                     { time: '12PM', temp: 21, icon: '🌧️' },

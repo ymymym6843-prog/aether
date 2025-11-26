@@ -9,7 +9,9 @@ class AetherApp {
             currentCity: 'Seoul',
             currentTab: 'today',
             weatherData: null,
-            favorites: []
+            favorites: [],
+            dataSource: 'mock',
+            locationLabel: 'Manual'
         };
 
         this.weatherEngine = new WeatherEngine('weatherCanvas');
@@ -21,7 +23,7 @@ class AetherApp {
     async init() {
         this.loadFavorites();
         this.bindEvents();
-        await this.loadWeatherData(this.state.currentCity);
+        await this.loadWeatherData(this.state.currentCity, { method: 'initial', label: 'Preset • Seoul' });
         this.weatherEngine.start();
         this.skyRenderer.init();
     }
@@ -56,7 +58,7 @@ class AetherApp {
         const handleSearch = () => {
             const city = searchInput.value.trim();
             if (city) {
-                this.loadWeatherData(city);
+                this.loadWeatherData(city, { method: 'search', label: `Search • ${city}` });
                 searchInput.value = '';
                 // Switch to today tab on search
                 this.switchTab('today');
@@ -70,10 +72,23 @@ class AetherApp {
 
         // GPS Button
         document.getElementById('gpsBtn').addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                this.showToast('Geolocation not supported');
+                this.updateLocationLabel('GPS unavailable');
+                return;
+            }
+
             this.showToast('Locating...');
-            setTimeout(() => {
-                this.loadWeatherData('Jeju');
-            }, 1000);
+            navigator.geolocation.getCurrentPosition(
+                ({ coords }) => {
+                    this.loadWeatherByCoords(coords.latitude, coords.longitude);
+                },
+                () => {
+                    this.showToast('Location blocked');
+                    this.updateLocationLabel('GPS blocked');
+                },
+                { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }
+            );
         });
 
         // Favorites Toggle
@@ -106,33 +121,55 @@ class AetherApp {
         }
     }
 
-    async loadWeatherData(city) {
+    async loadWeatherData(city, meta = { method: 'search' }) {
         try {
             const data = await apiService.getWeather(city);
-            this.state.weatherData = data;
-            this.state.currentCity = data.name || city; // Use returned name if available
-
-            // Render UI
-            DomRenderer.renderDashboardInfo(this.state.currentCity, data.timezone);
-            DomRenderer.renderCurrent(data);
-            DomRenderer.renderForecasts(data.forecast);
-            DomRenderer.renderAQI(data.aqi);
-            DomRenderer.renderLifestyle(data.lifestyle);
-            DomRenderer.renderHighlights(data.highlights);
-
-            // Update Engine
-            this.weatherEngine.setWeatherState(data.current.condition);
-
-            // Update SkyView Data
-            this.skyRenderer.updateData(data.sky);
-
-            // Update Favorite Button State
-            this.updateFavBtnState();
-
+            this.applyWeatherData(data, { ...meta, fallbackCity: city });
         } catch (error) {
             console.error('Failed to load weather:', error);
             this.showToast('City not found');
         }
+    }
+
+    async loadWeatherByCoords(lat, lon) {
+        try {
+            const data = await apiService.getWeatherByCoords(lat, lon);
+            const locationLabel = data.name ? `GPS • ${data.name}` : 'GPS fix';
+            this.applyWeatherData(data, { method: 'gps', label: locationLabel });
+            this.switchTab('today');
+        } catch (error) {
+            console.error('Failed to load GPS weather:', error);
+            this.showToast('Unable to fetch location weather');
+        }
+    }
+
+    applyWeatherData(data, meta) {
+        this.state.weatherData = data;
+        this.state.currentCity = data.name || meta?.fallbackCity || this.state.currentCity;
+        this.state.dataSource = data.dataSource || 'mock';
+
+        const usingMockFallback = data.meta?.fallbackReason && data.dataSource === 'mock';
+        const labelBase = meta?.label || (meta?.method === 'gps' ? 'GPS' : 'Manual');
+        this.state.locationLabel = usingMockFallback && labelBase ? `${labelBase} • Mock` : labelBase;
+
+        if (usingMockFallback) {
+            this.showToast(data.meta.fallbackReason);
+        }
+
+        DomRenderer.renderDashboardInfo(this.state.currentCity, data.timezone ?? 32400);
+        DomRenderer.renderCurrent(data);
+        DomRenderer.renderForecasts(data.forecast);
+        DomRenderer.renderAQI(data.aqi);
+        DomRenderer.renderLifestyle(data.lifestyle);
+        DomRenderer.renderHighlights(data.highlights);
+        DomRenderer.renderWeatherMap(data.current);
+
+        const engineState = this.mapConditionToState(data.current.condition, data.current.clouds);
+        this.weatherEngine.setWeatherState(engineState);
+        this.skyRenderer.updateData(data.sky);
+
+        this.updateFavBtnState();
+        this.updateDataBadges();
     }
 
     toggleFavorite() {
@@ -172,6 +209,26 @@ class AetherApp {
         }
     }
 
+    updateDataBadges() {
+        const sourceBadge = document.getElementById('dataSourceBadge');
+        if (sourceBadge) {
+            const isLive = this.state.dataSource === 'live';
+            sourceBadge.textContent = isLive ? 'Live API' : 'Mock Data';
+            sourceBadge.classList.toggle('pill-live', isLive);
+            sourceBadge.classList.toggle('pill-mock', !isLive);
+        }
+
+        this.updateLocationLabel(this.state.locationLabel);
+    }
+
+    updateLocationLabel(label) {
+        this.state.locationLabel = label;
+        const badge = document.getElementById('locationStatus');
+        if (badge) {
+            badge.textContent = label;
+        }
+    }
+
     renderFavorites() {
         const container = document.getElementById('favoritesList');
         if (this.state.favorites.length === 0) {
@@ -197,7 +254,7 @@ class AetherApp {
     }
 
     loadFavorite(city) {
-        this.loadWeatherData(city);
+        this.loadWeatherData(city, { method: 'favorite', label: `Favorite • ${city}` });
         this.switchTab('today');
     }
 
@@ -210,9 +267,42 @@ class AetherApp {
             if (this.state.currentCity === city) {
                 this.updateFavBtnState();
             }
+            this.renderFavorites();
         }
     }
 
+    mapConditionToState(condition, clouds = 0) {
+        const normalized = (condition || '').toLowerCase();
+        const map = {
+            'clear': 'clear',
+            'sunny': 'clear',
+            'clouds': 'clouds',
+            'few clouds': 'clouds',
+            'scattered clouds': 'clouds',
+            'broken clouds': 'clouds',
+            'overcast clouds': 'clouds',
+            'rain': 'rain',
+            'drizzle': 'rain',
+            'thunderstorm': 'thunder',
+            'snow': 'snow',
+            'mist': 'mist',
+            'fog': 'mist',
+            'haze': 'mist',
+            'smoke': 'mist',
+            'dust': 'mist',
+            'squall': 'wind',
+            'tornado': 'wind'
+        };
+
+        const fallback = map[normalized];
+        if (fallback) return fallback;
+
+        // Use cloud cover as a heuristic if condition string is unknown
+        if (clouds >= 60) return 'clouds';
+        if (clouds <= 15) return 'clear';
+
+        return 'default';
+    }
     showToast(msg) {
         // Create toast element
         const toast = document.createElement('div');
